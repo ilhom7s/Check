@@ -58,7 +58,7 @@ public class TeacherService {
     }
 
     @Transactional
-    public void deleteTeacher(Long id){
+    public String deleteTeacher(Long id){
         if(!teacherRepository.existsById(id)){
             throw new NotFoundException(String.format("Преподователь с таким id = %d не найден",id));
         }
@@ -69,6 +69,7 @@ public class TeacherService {
         }
         scheduleRepository.deleteTeachersPastByTeacherId(id,now);
         teacherRepository.deleteById(id);
+        return String.format("Учитель с id = %d удален",id);
     }
 
     public Page<ScheduleDto> getTeachersScheduleFromNow(Long id, int page, int size){

@@ -13,10 +13,19 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+
+
 
 @RestController
-@RequestMapping("/api/groups")
+@RequestMapping("/api/v1/groups")
 @AllArgsConstructor
 @Tag(name = "Group",description = "Управления Группами")
 public class GroupController {
@@ -31,10 +40,9 @@ public class GroupController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Удалить группу")
     public ResponseEntity<String> deleteGroup(@PathVariable Long id){
-        groupService.deleteGroupById(id);
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(String.format("Группа c id = %d успешно удалена",id));
+                .body(groupService.deleteGroupById(id));
     }
     @GetMapping("/schedule/{id}")
     @Operation(summary = "Вывести расписание группы в определенном курсе")
@@ -56,10 +64,9 @@ public class GroupController {
     @DeleteMapping("/course/time/{id}")
     @Operation(summary = "Удалить занятия курса для группы")
     public ResponseEntity<String> deleteGroupCourseTime(@PathVariable Long id, @RequestBody DeleteGroupsCourseTimeRequest deleteGroupsCourseTime){
-        groupService.deleteGroupCourseTime(id,deleteGroupsCourseTime);
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(String.format("Занятия группы с id = %d в %s удалено",id,deleteGroupsCourseTime.startTime()));
+                .body(groupService.deleteGroupCourseTime(id,deleteGroupsCourseTime));
     }
 
 

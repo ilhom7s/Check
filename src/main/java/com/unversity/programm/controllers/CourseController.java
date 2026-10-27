@@ -10,11 +10,17 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/course")
+@RequestMapping("/api/v1/course")
 @Tag(name = "Courses",description = "Управления Курсами")
 public class CourseController {
     private final CourseService courseService;
@@ -36,10 +42,9 @@ public class CourseController {
     @PostMapping("/add")
     @Operation(summary = "Добавить группу в курс")
     public ResponseEntity<String> addGroupInCourse(@RequestParam Long groupId,@RequestParam Long courseId){
-        courseService.addGroupInCourse(courseId,groupId);
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body("Группа успешно добавлена в курс");
+                .body(courseService.addGroupInCourse(courseId,groupId));
     }
     @GetMapping("/all")
     @Operation(summary = "Найти все курсы с группами")

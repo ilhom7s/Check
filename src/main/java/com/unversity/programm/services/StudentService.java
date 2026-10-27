@@ -52,8 +52,9 @@ public class StudentService {
     }
 
     @Transactional
-    public void deleteStudentById(Long id){
+    public String deleteStudentById(Long id){
         studentRepository.delete(findStudent(id));
+        return String.format("Студен с id = %d удален",id);
     }
 
     @Transactional
@@ -100,7 +101,7 @@ public class StudentService {
         return  studentRepository.findAll(pageable).map(dtoMapper::toStudentDto);
     }
     @Transactional
-    public void addStudentsInGroup(Long groupId, AddStudentsInGroupRequest addStudentsInGroup){
+    public String addStudentsInGroup(Long groupId, AddStudentsInGroupRequest addStudentsInGroup){
        Group group =  groupService.findGroupById(groupId);
 
        List<Student> students = studentRepository.findAllWithGroupsByIdIn(List.copyOf(addStudentsInGroup.listOfStudentsIds()));
@@ -116,6 +117,7 @@ public class StudentService {
        }
 
        students.forEach(student -> student.getGroups().add(group));
+       return String.format("Студенты добавлены в группу с id = %d",groupId);
     }
 
 

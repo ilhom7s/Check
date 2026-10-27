@@ -46,13 +46,14 @@ public class GroupService {
     }
 
     @Transactional
-    public void deleteGroupById(Long id){
+    public String deleteGroupById(Long id){
         if(!groupRepository.existsById(id)) throw new NotFoundException(String.format("Группа с таким id = %d не найден",id));
         if(studentRepository.countStudentsWithOnlyOneThisGroup(id)>0){
             throw new GroupDeletionException("Невозможно удалить группу так как у этой группы есть студенты у которых единственная группа");
         }
         studentRepository.deleteStudentGroupLinksByGroupId(id);
         groupRepository.deleteById(id);
+        return String.format("Группа с таким id = %d удалена",id);
     }
 
     @Transactional(readOnly = true)
@@ -84,12 +85,14 @@ public class GroupService {
     }
 
     @Transactional
-    public void deleteGroupCourseTime(Long id, DeleteGroupsCourseTimeRequest deleteRequest){
+    public String deleteGroupCourseTime(Long id, DeleteGroupsCourseTimeRequest deleteRequest){
         Schedule schedule = scheduleRepository.findGroupsCourseByStartTime(id, deleteRequest.courseId(), deleteRequest.startTime())
                 .orElseThrow(() -> new NotFoundException(String.format("Не найдено занятие с группой id = %d и курсом id = %d в %s",
                         id, deleteRequest.courseId(), deleteRequest.startTime())));;
 
         scheduleRepository.delete(schedule);
+        return String.format("Занятия группы с id = %d в курсе с courseId = %d в %s удалена",
+                id,deleteRequest.courseId(),deleteRequest.startTime());
     }
 
 

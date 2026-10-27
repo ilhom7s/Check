@@ -13,12 +13,9 @@ import com.unversity.programm.mapper.DtoMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -39,11 +36,12 @@ public class CourseService {
 
     }
     @Transactional
-    public void  addGroupInCourse(Long courseId,Long groupId){
+    public String  addGroupInCourse(Long courseId,Long groupId){
         Course course = findCourseAndHisGroupsById(courseId);
         if(!course.getGroups().add(groupService.findGroupById(groupId))){
             throw new GroupAlreadyInCourseException(String.format("Группа  с id = %d уже в этом курсе",groupId));
         }
+        return String.format("Группа c id = %d добавлено в курс %s",groupId,course.getName());
     }
     @Transactional
     public CourseDto createNewCourse(CreateNewCourseRequestDto createNewCourseRequest){
