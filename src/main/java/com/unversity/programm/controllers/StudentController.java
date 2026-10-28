@@ -1,5 +1,6 @@
 package com.unversity.programm.controllers;
 
+import com.unversity.programm.constants.ControllerConstants;
 import com.unversity.programm.dto.AddStudentsInGroupRequest;
 import com.unversity.programm.dto.ChangeStudentRequestDto;
 import com.unversity.programm.dto.CreateStudentRequestDto;
@@ -49,7 +50,7 @@ public class StudentController {
 
     @GetMapping
     @Operation(summary = "Вывести студентов по 20 шт")
-    public ResponseEntity<Page<StudentDto>> getAllStudents(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "20") int size){
+    public ResponseEntity<Page<StudentDto>> getAllStudents(@RequestParam(defaultValue = ControllerConstants.pageDefaultValue) int page, @RequestParam(defaultValue = ControllerConstants.pageSizeDefaultValue) int size){
         Page<StudentDto> students = studentService.getStudents(page,size);
         return ResponseEntity.ok(students);
     }

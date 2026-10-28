@@ -1,5 +1,6 @@
 package com.unversity.programm.controllers;
 
+import com.unversity.programm.constants.ControllerConstants;
 import com.unversity.programm.dto.CreateTeacherRequestDto;
 import com.unversity.programm.dto.ScheduleDto;
 import com.unversity.programm.dto.TeacherDto;
@@ -48,8 +49,8 @@ public class TeacherController {
     @GetMapping("/schedule/{id}")
     @Operation(summary = "Вывести расписание учителя по id")
     public ResponseEntity<Page<ScheduleDto>> getTeachersSchedule(@PathVariable Long id,
-                                                                 @RequestParam(defaultValue = "0") int page,
-                                                                 @RequestParam(defaultValue = "20") int size){
+                                                                 @RequestParam(defaultValue = ControllerConstants.pageDefaultValue) int page,
+                                                                 @RequestParam(defaultValue = ControllerConstants.pageSizeDefaultValue) int size){
         return ResponseEntity.status(HttpStatus.FOUND).body(teacherService.getTeachersScheduleFromNow(id,page,size));
     }
 
