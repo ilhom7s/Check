@@ -7,6 +7,5 @@ public record UpdateGroupCourseTimeRequest(
         Long courseId,
         LocalDateTime oldStartTime,
         LocalDateTime newStartTime,
-        LocalDateTime newEndTime
-) {
+        LocalDateTime newEndTime) {
 }

@@ -6,6 +6,5 @@ public record CreateTeacherRequestDto(
         @NotBlank
         String name,
         @NotBlank
-        String lastName
-) {
+        String lastName) {
 }

@@ -6,6 +6,5 @@ public record CourseDtoWithGroups(
         Long id,
         String name,
         String description,
-        Set<GroupDto> groups
-) {
+        Set<GroupDto> groups) {
 }

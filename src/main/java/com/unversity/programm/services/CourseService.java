@@ -11,12 +11,14 @@ import com.unversity.programm.exceptions.GroupAlreadyInCourseException;
 import com.unversity.programm.exceptions.NotFoundException;
 import com.unversity.programm.mapper.DtoMapper;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CourseService {
@@ -29,50 +31,57 @@ public class CourseService {
                 ()->new NotFoundException(String.format("Курс с таким id = %d не найден",id))
         );
     }
+
     public Course findCourseAndHisGroupsById(Long courseId){
          return courseRepository.findCourseAndHisGroupsByCourseId(courseId).orElseThrow(
                 ()->new NotFoundException(String.format("Курс с таким id = %d не найден",courseId))
         );
-
     }
+
     @Transactional
     public String  addGroupInCourse(Long courseId,Long groupId){
+        log.debug("Добавление группы в курс id={}",courseId);
         Course course = findCourseAndHisGroupsById(courseId);
         if(!course.getGroups().add(groupService.findGroupById(groupId))){
+            log.warn("Группа не добавилась так как уже в этом курсе groupId={}",groupId);
             throw new GroupAlreadyInCourseException(String.format("Группа  с id = %d уже в этом курсе",groupId));
         }
+        log.info("Группа c id={} добавилась в курс name={}",groupId,course.getName());
         return String.format("Группа c id = %d добавлено в курс %s",groupId,course.getName());
     }
+
     @Transactional
     public CourseDto createNewCourse(CreateNewCourseRequestDto createNewCourseRequest){
+        log.debug("Создание нового курса name={}",createNewCourseRequest.name());
         if(courseRepository.existsByName(createNewCourseRequest.name())){
+            log.warn("Курс не создан так как уже существует name={}",createNewCourseRequest.name());
             throw new AlreadyInBaseException(String.format("Курс с таким именем %s уже сущетсвует в базе",createNewCourseRequest.name()));
         }
         Course course = new Course();
         course.setName(createNewCourseRequest.name());
         course.setDescription(createNewCourseRequest.description());
+        log.info("Курс создан с именем={}",createNewCourseRequest.name());
         return dtoMapper.toCourseDto(courseRepository.save(course));
     }
 
     @Transactional
     public CourseDto changeCourse(Long courseId, UpdateCourseDto updateCourseDto){
+        log.debug("Обновление данных курса id={}",courseId);
         Course course = findCourseById(courseId);
         if(courseRepository.existsByNameAndIdNot(updateCourseDto.newName(),courseId)){
+            log.warn("Курс не обновился. Имя {} уже существует",updateCourseDto.newName());
             throw new AlreadyInBaseException(String.format("Курс с названием '%s' уже существует",updateCourseDto.newName()));
         }
         course.setName(updateCourseDto.newName());
         course.setDescription(updateCourseDto.newDescription());
+        log.info("Курс с id={} обновлен",courseId);
         return dtoMapper.toCourseDto(course);
-
     }
+
     @Transactional(readOnly = true)
     public Page<CourseDtoWithGroups> getAllCoursesWithGroups(int page, int size){
+        log.debug("Вывод курсов с их группами");
+        log.info("Найдены курс с их группами");
         return courseRepository.findAll(PageRequest.of(page,size,Sort.by("id"))).map(dtoMapper::toCourseDtoWithGroups);
     }
-
-
-
-
-
-
 }

@@ -11,7 +11,6 @@ import com.unversity.programm.entity.Teacher;
 import com.unversity.programm.exceptions.AlreadyInBaseException;
 import com.unversity.programm.exceptions.ConflictException;
 import com.unversity.programm.exceptions.NotFoundException;
-
 import com.unversity.programm.mapper.DtoMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,10 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
-
-
 
 @Service
 @AllArgsConstructor
@@ -51,7 +47,6 @@ public class TeacherService {
         Teacher teacher = teacherRepository.findById(id).orElseThrow(
                 ()-> new NotFoundException(String.format("Преподователь с id = %d не найден",id))
         );
-
         teacher.setName(updateTeacher.newName());
         teacher.setLastName(updateTeacher.newLastName());
         return dtoMapper.toTeacherDto(teacher);
@@ -77,5 +72,4 @@ public class TeacherService {
         Page<Schedule> schedules = scheduleRepository.findTeachersScheduleFromNow(id,LocalDateTime.now(),pageable);
         return schedules.map(dtoMapper::toScheduleDto);
     }
-
 }

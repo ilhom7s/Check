@@ -4,6 +4,5 @@ import java.time.LocalDateTime;
 
 public record DeleteGroupsCourseTimeRequest(
         Long courseId,
-        LocalDateTime startTime
-) {
+        LocalDateTime startTime) {
 }

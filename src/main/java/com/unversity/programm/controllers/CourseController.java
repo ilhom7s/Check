@@ -1,4 +1,5 @@
 package com.unversity.programm.controllers;
+import com.unversity.programm.constants.ControllerConstants;
 import com.unversity.programm.dto.CourseDto;
 import com.unversity.programm.dto.CourseDtoWithGroups;
 import com.unversity.programm.dto.CreateNewCourseRequestDto;
@@ -24,34 +25,25 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Tag(name = "Courses",description = "Управления Курсами")
 public class CourseController {
     private final CourseService courseService;
-
     @PostMapping
     @Operation(summary = "Создать Курс")
     public ResponseEntity<CourseDto> createCourse(@RequestBody CreateNewCourseRequestDto createCourse){
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(courseService.createNewCourse(createCourse));
+        return ResponseEntity.status(HttpStatus.CREATED).body(courseService.createNewCourse(createCourse));
     }
     @PostMapping("/update/{id}")
     @Operation(summary = "Обновить курс")
     public ResponseEntity<CourseDto> updateCourse(@PathVariable Long id, @RequestBody UpdateCourseDto updateCourse){
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(courseService.changeCourse(id,updateCourse));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(courseService.changeCourse(id,updateCourse));
     }
     @PostMapping("/add")
     @Operation(summary = "Добавить группу в курс")
     public ResponseEntity<String> addGroupInCourse(@RequestParam Long groupId,@RequestParam Long courseId){
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(courseService.addGroupInCourse(courseId,groupId));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(courseService.addGroupInCourse(courseId,groupId));
     }
     @GetMapping("/all")
     @Operation(summary = "Найти все курсы с группами")
-    public ResponseEntity<Page<CourseDtoWithGroups>> getAllCoursesWithGroups(@RequestParam(defaultValue = "0")int page,
-                                                                             @RequestParam(defaultValue = "20") int size){
-        return ResponseEntity
-                .ok(courseService.getAllCoursesWithGroups(page, size));
+    public ResponseEntity<Page<CourseDtoWithGroups>> getAllCoursesWithGroups(@RequestParam(defaultValue = ControllerConstants.pageDefaultValue)int page,
+                                                                             @RequestParam(defaultValue = ControllerConstants.pageSizeDefaultValue) int size){
+        return ResponseEntity.ok(courseService.getAllCoursesWithGroups(page, size));
     }
-
 }

@@ -4,6 +4,5 @@ public record ChangeStudentRequestDto(
         String name,
         String lastName,
         Long oldGroupId,
-        Long newGroupId
-) {
+        Long newGroupId) {
 }

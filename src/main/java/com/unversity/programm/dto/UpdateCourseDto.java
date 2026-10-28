@@ -5,6 +5,5 @@ import jakarta.validation.constraints.NotBlank;
 public record UpdateCourseDto(
         @NotBlank
         String newName,
-        String newDescription
-) {
+        String newDescription) {
 }
