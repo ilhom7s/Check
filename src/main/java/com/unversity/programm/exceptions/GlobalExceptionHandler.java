@@ -1,5 +1,6 @@
 package com.unversity.programm.exceptions;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,7 +33,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AlreadyInBaseException.class)
     public ResponseEntity<String> handleAlreadyInBaseException(AlreadyInBaseException alreadyInBaseException){
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.CONFLICT)
                 .body(alreadyInBaseException.getMessage());
     }
     @ExceptionHandler(ConflictException.class)
@@ -44,7 +45,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(GroupAlreadyInCourseException.class)
     public ResponseEntity<String> handleGroupAlreadyInCourse(GroupAlreadyInCourseException groupAlreadyInCourse){
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.CONFLICT)
                 .body(groupAlreadyInCourse.getMessage());
     }
     @ExceptionHandler(GroupDeletionException.class)
@@ -53,6 +54,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(groupDeletion.getMessage());
     }
+
 
 
 
