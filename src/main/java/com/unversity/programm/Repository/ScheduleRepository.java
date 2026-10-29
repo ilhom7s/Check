@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     boolean existsByTeacherIdAndEndTimeAfter(Long id, LocalDateTime time);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Query("DELETE FROM Schedule s WHERE s.teacher.id = :teacherId AND s.endTime <=:now")
     void deleteTeachersPastByTeacherId(@Param("teacherId")Long id,@Param("now")LocalDateTime time);
 

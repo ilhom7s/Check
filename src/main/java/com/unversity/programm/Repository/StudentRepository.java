@@ -17,9 +17,10 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
     @Query("SELECT COUNT(s) FROM Student s JOIN s.groups g WHERE g.id = :groupId AND SIZE(s.groups) = 1")
     Long countStudentsWithOnlyOneThisGroup(@Param("groupId")Long groupId);
 
-    @Modifying(clearAutomatically = true)
-    @Query(value = "DELETE FROM student_groups WHERE group_id = :groupId",nativeQuery = true)
-    void deleteStudentGroupLinksByGroupId(@Param("groupId") Long groupId);
+    @Modifying
+    @Query("DELETE FROM Student s WHERE s.id = :id")
+    int deleteStudentById(@Param("id")Long id);
+
 
     boolean existsByNameAndLastNameAndIdNot(String name,String lastName,Long id);
 }

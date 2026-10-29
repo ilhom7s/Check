@@ -1,6 +1,7 @@
 package com.unversity.programm.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -37,7 +38,21 @@ public class Student {
     @JoinTable(
             name = "student_groups",
             joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id")
+            inverseJoinColumns = @JoinColumn(name = "group_id"),
+            inverseForeignKey = @ForeignKey(foreignKeyDefinition =
+                    "FOREIGN KEY (group_id) REFERENCES study_groups (id) ON DELETE CASCADE")
     )
     private Set<Group> groups = new HashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Student other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Student.class.hashCode();
+    }
 }

@@ -1,4 +1,4 @@
-package com.unversity.programm;
+package com.unversity.programm.services.scheduler;
 
 import com.unversity.programm.Repository.ScheduleRepository;
 import lombok.AllArgsConstructor;

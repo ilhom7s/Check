@@ -32,4 +32,16 @@ public class Group {
     @ManyToMany(mappedBy = "groups",fetch = FetchType.LAZY)
     private Set<Course> courses;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Group other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Group.class.hashCode();
+    }
+
 }

@@ -18,10 +18,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OneOrManyNotFoundException.class)
     public ResponseEntity<Map<String,Object>> handleOneOrManyStudentsNotFound(OneOrManyNotFoundException exception){
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", " Не найдены",
-                        "missingIds", exception.getMissingIds()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", " Не найдены", "missingIds", exception.getMissingIds()));
     }
 
 

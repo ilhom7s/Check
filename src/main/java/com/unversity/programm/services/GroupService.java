@@ -9,9 +9,11 @@ import com.unversity.programm.dto.ScheduleDto;
 import com.unversity.programm.dto.UpdateGroupCourseTimeRequest;
 import com.unversity.programm.entity.Group;
 import com.unversity.programm.entity.Schedule;
+import com.unversity.programm.entity.mapper.GroupMapper;
+import com.unversity.programm.entity.mapper.ScheduleMapper;
 import com.unversity.programm.exceptions.NotFoundException;
-import com.unversity.programm.mapper.DtoMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,9 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class GroupService {
     private final GroupRepository groupRepository;
-    private final DtoMapper dtoMapper;
+
     private final StudentRepository studentRepository;
     private final ScheduleRepository scheduleRepository;
+    private final GroupMapper groupMapper;
+    private final ScheduleMapper scheduleMapper;
 
     public Group findGroupById(Long id) {
         return groupRepository.findById(id).orElseThrow(() -> {
@@ -43,28 +47,34 @@ public class GroupService {
     @Transactional
     public GroupDto createNewGroup(String name){
         log.debug("Создание группы: name={}", name);
-        if(groupRepository.existsByGroupName(name)) throw new AlreadyInBaseException(String.format("Группа с  именем = %s уже существует",name));
-        log.warn("Группа не создана, имя уже занято: name={}", name);
+        if(groupRepository.existsByGroupName(name)){
+            log.warn("Выброшено исключения при попытке создать группу");
+            throw new AlreadyInBaseException(String.format("Группа с  именем = %s уже существует",name));
+        }
+
         Group newGroup = new Group();
         newGroup.setGroupName(name);
-
-        log.info("Группа создана: name={}",name);
-        return dtoMapper.toGroupDto(groupRepository.save(newGroup));
+        try{
+            log.info("Группа создана: name={}",name);
+            return groupMapper.toGroupDto(groupRepository.save(newGroup));
+        } catch (DataIntegrityViolationException exception) {
+            log.warn("Группа не создана, имя занято параллельным запросом");
+            throw new AlreadyInBaseException(String.format("Группа с именем %s уже существует", name));
+        }
     }
 
     @Transactional
     public String deleteGroupById(Long id){
         log.debug("Удаление группы: id={}",id);
-        if(!groupRepository.existsById(id)){
-            log.warn("Группа для удаления не найдена: id={}",id);
-            throw new NotFoundException(String.format("Группа с таким id = %d не найден",id));
-        }
         if(studentRepository.countStudentsWithOnlyOneThisGroup(id)>0){
             log.warn("Группа id={} не удалена: у студентов она единственная",id);
             throw new GroupDeletionException("Невозможно удалить группу так как у этой группы есть студенты у которых единственная группа");
         }
-        studentRepository.deleteStudentGroupLinksByGroupId(id);
-        groupRepository.deleteById(id);
+        int deletedGroupCount = groupRepository.deleteGroupById(id);
+        if(deletedGroupCount>0){
+            log.warn("Группа для удаления не найдена: id={}",id);
+            throw new NotFoundException(String.format("Группа с таким id = %d не найден",id));
+        }
         log.info("Группа удалена: id={}", id);
         return String.format("Группа с таким id = %d удалена",id);
     }
@@ -76,7 +86,7 @@ public class GroupService {
             log.warn("График не получен, группа не найдена: id={}", groupId);
             throw  new NotFoundException(String.format("Группа с таким id = %d не найден",groupId));
         }
-        return scheduleRepository.findByGroupId(groupId, PageRequest.of(page,size, Sort.by("startTime"))).map(dtoMapper::toScheduleDto);
+        return scheduleRepository.findByGroupId(groupId, PageRequest.of(page,size, Sort.by("startTime"))).map(scheduleMapper::toScheduleDto);
     }
 
     @Transactional
@@ -88,7 +98,8 @@ public class GroupService {
                 .orElseThrow(() -> {
                     log.warn("Занятие не найдено: groupId={}, courseId={}, start={}", id, updateDto.courseId(), updateDto.oldStartTime());
                     return new NotFoundException(String.format("Не найдено занятие с группой id = %d и курсом id = %d в %s",
-                            id, updateDto.courseId(), updateDto.oldStartTime()));});
+                            id, updateDto.courseId(), updateDto.oldStartTime()));
+                });
 
         Duration duration = Duration.between(schedule.getStartTime(), schedule.getEndTime());
         LocalDateTime newStart = updateDto.newStartTime();
@@ -105,7 +116,7 @@ public class GroupService {
         schedule.setStartTime(newStart);
         schedule.setEndTime(newEnd);
         log.info("Занятие перенесено: scheduleId={}, groupId={}, с {} на {}", schedule.getId(), id, updateDto.oldStartTime(), newStart);
-        return dtoMapper.toScheduleDto(schedule);
+        return scheduleMapper.toScheduleDto(schedule);
     }
 
     @Transactional

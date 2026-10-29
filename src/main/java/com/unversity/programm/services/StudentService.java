@@ -7,7 +7,7 @@ import com.unversity.programm.dto.CreateStudentRequestDto;
 import com.unversity.programm.dto.StudentDto;
 import com.unversity.programm.entity.Group;
 import com.unversity.programm.entity.Student;
-import com.unversity.programm.mapper.DtoMapper;
+import com.unversity.programm.entity.mapper.StudentMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import com.unversity.programm.exceptions.AlreadyInBaseException;
@@ -31,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class StudentService {
     private final StudentRepository studentRepository;
     private final GroupRepository groupRepository;
-    private final DtoMapper dtoMapper;
+    private final StudentMapper studentMapper;
     private final GroupService groupService;
 
     @Transactional
@@ -59,13 +60,17 @@ public class StudentService {
         newStudent.setLastName(request.lastName());
         newStudent.getGroups().addAll(groups);
         log.info("Студент создан");
-        return dtoMapper.toStudentDto(studentRepository.save(newStudent));
+        return studentMapper.toStudentDto(studentRepository.save(newStudent));
     }
 
     @Transactional
     public String deleteStudentById(Long id){
         log.debug("Удаление студента: id={}", id);
-        studentRepository.delete(findStudent(id));
+        int deletedStudent = studentRepository.deleteStudentById(id);
+        if(deletedStudent>0){
+            log.warn("При удалении студента,студент не нашелся id={}", id);
+            throw new NotFoundException(String.format("Студент с таким id = %d не найден", id));
+        }
         log.info("Студент удалён: id={}", id);
         return String.format("Студен с id = %d удален",id);
     }
@@ -94,7 +99,7 @@ public class StudentService {
         student.setLastName(newLastName);
         Set<Group> studentGroups = student.getGroups();
 
-        if(oldGroupId!=null) {
+        if(Objects.nonNull(oldGroupId)) {
             Group oldGroup = groupService.findGroupById(changeStudentRequestDto.oldGroupId());
             if (!studentGroups.remove(oldGroup)) {
                 log.warn("Студент id={} не изменён: не состоит в группе id={}", id, oldGroupId);
@@ -106,7 +111,7 @@ public class StudentService {
         }
             studentRepository.save(student);
             log.info("Студент изменён: id={}", id);
-            return dtoMapper.toStudentDto(student);
+            return studentMapper.toStudentDto(student);
     }
 
     public Student findStudent(Long id){
@@ -122,14 +127,13 @@ public class StudentService {
     public Page<StudentDto> getStudents(int page, int size){
         log.debug("Список студентов: page={}, size={}", page, size);
         Pageable pageable = PageRequest.of(page,size, Sort.by("lastName","name"));
-        return  studentRepository.findAll(pageable).map(dtoMapper::toStudentDto);
+        return  studentRepository.findAll(pageable).map(studentMapper::toStudentDto);
     }
     @Transactional
     public String addStudentsInGroup(Long groupId, AddStudentsInGroupRequest addStudentsInGroup){
         log.debug("Добавление студентов в группу: groupId={}, studentIds={}",
                 groupId, addStudentsInGroup.listOfStudentsIds());
 
-       Group group =  groupService.findGroupById(groupId);
        List<Student> students = studentRepository.findAllWithGroupsByIdIn(List.copyOf(addStudentsInGroup.listOfStudentsIds()));
        Set<Long> studentsIds = students.stream().map(Student::getId).collect(Collectors.toSet());
        Set<Long> missingIds = new HashSet<>(addStudentsInGroup.listOfStudentsIds());
@@ -138,7 +142,7 @@ public class StudentService {
            log.warn("Студенты не добавлены в группу id={}, не найдены: missingIds={}", groupId, missingIds);
            throw new OneOrManyNotFoundException(missingIds);
        }
-
+       Group group =  groupService.findGroupById(groupId);
        students.forEach(student -> student.getGroups().add(group));
        log.info("Студенты добавлены в группу: groupId={}, количество={}", groupId, students.size());
        return String.format("Студенты добавлены в группу с id = %d",groupId);
