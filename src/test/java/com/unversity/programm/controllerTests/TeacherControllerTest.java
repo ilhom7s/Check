@@ -1,10 +1,8 @@
 package com.unversity.programm.controllerTests;
-
-
 import com.unversity.programm.constants.ControllerConstants;
 import com.unversity.programm.controllers.TeacherController;
-import com.unversity.programm.dto.*;
-
+import com.unversity.programm.dto.TeacherDto;
+import com.unversity.programm.dto.CreateTeacherRequestDto;
 import com.unversity.programm.services.TeacherService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +13,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
-
+import com.unversity.programm.dto.UpdateTeacherRequest;
 import java.util.List;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import com.unversity.programm.dto.ScheduleDto;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @WebMvcTest(TeacherController.class)
 public class TeacherControllerTest {

@@ -23,13 +23,15 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
+    @EqualsAndHashCode.Include
     private Long id;
     @Column(name = "name",unique = true)
+    @EqualsAndHashCode.Include
     private String name;
     @Column(name = "description")
     private String description;
@@ -42,17 +44,5 @@ public class Course {
             inverseJoinColumns = @JoinColumn(name = "group_id")
     )
     private Set<Group> groups = new HashSet<>();
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Course other)) return false;
-        return id != null && id.equals(other.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Course.class.hashCode();
-    }
 
 }

@@ -1,4 +1,5 @@
 package com.unversity.programm.entity;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,12 +18,15 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Group {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
+    @EqualsAndHashCode.Include
     private Long id;
+    @EqualsAndHashCode.Include
     @Column(name = "group_name",unique = true)
     private String groupName;
 
@@ -32,16 +36,6 @@ public class Group {
     @ManyToMany(mappedBy = "groups",fetch = FetchType.LAZY)
     private Set<Course> courses;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Group other)) return false;
-        return id != null && id.equals(other.getId());
-    }
 
-    @Override
-    public int hashCode() {
-        return Group.class.hashCode();
-    }
 
 }

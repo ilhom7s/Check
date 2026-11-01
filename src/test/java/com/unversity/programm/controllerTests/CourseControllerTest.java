@@ -2,7 +2,11 @@ package com.unversity.programm.controllerTests;
 
 import com.unversity.programm.constants.ControllerConstants;
 import com.unversity.programm.controllers.CourseController;
-import com.unversity.programm.dto.*;
+import com.unversity.programm.dto.UpdateCourseDto;
+import com.unversity.programm.dto.CreateNewCourseRequestDto;
+import com.unversity.programm.dto.CourseDto;
+import com.unversity.programm.dto.CourseDtoWithGroups;
+import com.unversity.programm.dto.GroupDto;
 import com.unversity.programm.services.CourseService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +53,6 @@ public class CourseControllerTest {
     @Test
     void updateCourse() throws Exception{
         UpdateCourseDto updateRequest = new UpdateCourseDto("Business","Business class");
-
         CourseDto updatedCourse = new CourseDto(id,"Business","Business class");
         when(courseService.changeCourse(id,updateRequest)).thenReturn(updatedCourse);
         mockMvc.perform(post("/api/v1/course/update/{id}",id)
