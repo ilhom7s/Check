@@ -71,7 +71,7 @@ public class GroupService {
             throw new GroupDeletionException("Невозможно удалить группу так как у этой группы есть студенты у которых единственная группа");
         }
         int deletedGroupCount = groupRepository.deleteGroupById(id);
-        if(deletedGroupCount>0){
+        if(deletedGroupCount==0){
             log.warn("Группа для удаления не найдена: id={}",id);
             throw new NotFoundException(String.format("Группа с таким id = %d не найден",id));
         }

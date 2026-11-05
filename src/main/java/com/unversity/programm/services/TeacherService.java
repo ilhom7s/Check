@@ -88,7 +88,7 @@ public class TeacherService {
         }
         scheduleRepository.deleteTeachersPastByTeacherId(id,now);
         int deletedTeacher = teacherRepository.deleteTeacherById(id);
-        if(deletedTeacher<0){
+        if(deletedTeacher==0){
             throw new NotFoundException(String.format("Преподователь с таким id = %d не найден",id));
         }
         log.info("Учитель удален с id = {}",id);

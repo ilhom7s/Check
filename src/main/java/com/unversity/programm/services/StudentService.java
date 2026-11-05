@@ -67,7 +67,7 @@ public class StudentService {
     public String deleteStudentById(Long id){
         log.debug("Удаление студента: id={}", id);
         int deletedStudent = studentRepository.deleteStudentById(id);
-        if(deletedStudent>0){
+        if(deletedStudent==0){
             log.warn("При удалении студента,студент не нашелся id={}", id);
             throw new NotFoundException(String.format("Студент с таким id = %d не найден", id));
         }
